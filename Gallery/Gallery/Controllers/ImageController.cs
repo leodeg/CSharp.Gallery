@@ -11,26 +11,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gallery.Controllers
 {
-	public class GalleryController : Controller
+	public class ImageController : Controller
 	{
 		private readonly IImageService imageService;
 
-		public GalleryController(IImageService imageService)
+		public ImageController(IImageService imageService)
 		{
 			this.imageService = imageService;
 		}
 
 		public IActionResult Index()
 		{
-			var model = new GalleryIndexViewModel()
-			{
-				Images = imageService.GetAll()
-			};
-
-			return View(model);
+			return View();
 		}
 
-		public IActionResult Details(int? id)
+		public IActionResult Create()
+		{
+			return View(new Image());
+		}
+
+		public IActionResult Edit(int? id)
 		{
 			if (id == null)
 				return NotFound();
@@ -38,6 +38,18 @@ namespace Gallery.Controllers
 			var image = imageService.GetById(id.Value);
 			if (image == null)
 				return NotFound();
+
+			return View(image);
+		}
+
+		public IActionResult Save(Image image, IFormFile file)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(image);
+			}
+
+			imageService.Save(image);
 
 			return View(image);
 		}

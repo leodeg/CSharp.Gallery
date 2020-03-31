@@ -1,0 +1,25 @@
+﻿@model Gallery.Data.Models.Image
+
+@{
+	ViewData["Title"] = "Details";
+}
+
+<section id="image-details">
+	<h1>@Model.Title</h1>
+	<h4>Tags</h4>
+	<hr />
+	@if (Model.Tags != null && Model.Tags.Any())
+	{
+		<ul class="list-group">
+			@foreach (var tag in Model.Tags)
+			{
+				<li class="list-group-item">tag</li>
+			}
+		</ul>
+	}
+
+	<h4>Image</h4>
+	<hr />
+	<img src="~/content/img/@Model.Url" alt="" />
+</section>
+

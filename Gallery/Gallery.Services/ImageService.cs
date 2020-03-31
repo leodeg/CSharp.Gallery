@@ -11,6 +11,7 @@ namespace Gallery.Services
 		public Image GetById(int id);
 		public IEnumerable<Image> GetAll();
 		public IEnumerable<Image> GetWithTag(string tag);
+		public void Save(Image image);
 	}
 
 	public class ImageService : IImageService
@@ -35,6 +36,17 @@ namespace Gallery.Services
 		public IEnumerable<Image> GetWithTag(string tag)
 		{
 			return imageRepository.GetWithTag(tag);
+		}
+
+		public async void Save(Image image)
+		{
+			if (image == null)
+				throw new ArgumentNullException();
+
+			if (image.Id == 0)
+				imageRepository.Create(image);
+			else imageRepository.Update(image.Id, image);
+			await imageRepository.SaveAsync();
 		}
 	}
 }
