@@ -1,4 +1,5 @@
 ﻿using Gallery.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +18,26 @@ namespace Gallery.Data.Repositories
 
 		public IEnumerable<Image> Get()
 		{
-			return context.Images.OrderBy(x => x.Title);
+			return context.Images.Include(c => c.Tags).OrderBy(x => x.Title);
+		}
+
+		public IEnumerable<Image> GetWithTag(string tag)
+		{
+			return context.Images
+				.Include(c => c.Tags)
+				.Where(c => c.Tags
+					.Any(t => t.Title.Contains(tag)))
+				.OrderBy(x => x.Title);
 		}
 
 		public Image Get(int id)
 		{
-			return context.Images.FirstOrDefault(x => x.Id == id);
+			return context.Images.Include(c => c.Tags).FirstOrDefault(x => x.Id == id);
 		}
 
 		public Image Get(string title)
 		{
-			return context.Images.SingleOrDefault(x => x.Title == title);
+			return context.Images.Include(c => c.Tags).SingleOrDefault(x => x.Title == title);
 		}
 
 		public void Create(Image entity)
@@ -59,7 +69,7 @@ namespace Gallery.Data.Repositories
 
 		public bool Delete(int id)
 		{
-			Image image = context.Images.FirstOrDefault(x => x.Id == id);
+			Image image = context.Images.Include(c => c.Tags).FirstOrDefault(x => x.Id == id);
 			if (image != null)
 			{
 				context.Images.Remove(image);
@@ -84,6 +94,25 @@ namespace Gallery.Data.Repositories
 			if (await context.SaveChangesAsync() > 0)
 				return true;
 			return false;
+		}
+
+		private bool disposed = false;
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!this.disposed)
+			{
+				if (disposing)
+				{
+					context.Dispose();
+				}
+			}
+			this.disposed = true;
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 	}
 }

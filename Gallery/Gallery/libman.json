@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootswatch@4.4.1",
+      "destination": "wwwroot/lib/bootswatch/",
+      "files": [
+        "lux/bootstrap.css",
+        "lux/bootstrap.min.css"
+      ]
+    }
+  ]
+}

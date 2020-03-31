@@ -4,26 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gallery.Data.Repositories;
 using Gallery.Models;
+using Gallery.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gallery.Controllers
 {
 	public class GalleryController : Controller
 	{
-		private readonly IImageRepository imageRepository;
-		private readonly ITagRepository tagRepository;
+		private readonly IImageService imageService;
 
-		public GalleryController(IImageRepository imageRepository, ITagRepository tagRepository)
+		public GalleryController(IImageService imageService)
 		{
-			this.imageRepository = imageRepository;
-			this.tagRepository = tagRepository;
+			this.imageService = imageService;
 		}
 
 		public IActionResult Index()
 		{
 			var model = new GalleryIndexViewModel()
 			{
-				Images = imageRepository.Get()
+				Images = imageService.GetAll()
 			};
 
 			return View(model);

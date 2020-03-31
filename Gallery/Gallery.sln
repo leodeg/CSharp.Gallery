@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gallery.Data", "Gallery.Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gallery", "Gallery\Gallery.csproj", "{D9C4DB5D-2544-419B-B047-EC04F2E19DDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gallery.Services", "Gallery.Services\Gallery.Services.csproj", "{939541FB-E051-4268-962B-578E6AA78C91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D9C4DB5D-2544-419B-B047-EC04F2E19DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9C4DB5D-2544-419B-B047-EC04F2E19DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9C4DB5D-2544-419B-B047-EC04F2E19DDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{939541FB-E051-4268-962B-578E6AA78C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{939541FB-E051-4268-962B-578E6AA78C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{939541FB-E051-4268-962B-578E6AA78C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{939541FB-E051-4268-962B-578E6AA78C91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

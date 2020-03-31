@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Gallery.Data;
 using Gallery.Data.Models;
 using Gallery.Data.Repositories;
+using Gallery.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -36,6 +37,8 @@ namespace Gallery
 
 			services.AddTransient<IRepository<Image>, ImageRepository>();
 			services.AddTransient<IImageRepository, ImageRepository>();
+
+			services.AddScoped<IImageService, ImageService>();
 
 			services.AddControllersWithViews();
 			services.AddRazorPages();

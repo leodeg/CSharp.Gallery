@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Gallery.Data.Repositories
 {
-	public interface IRepository<T>
+	public interface IRepository<T> : IDisposable where T : class
 	{
 		T Get(int id);
 		IEnumerable<T> Get();
