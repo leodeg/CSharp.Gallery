@@ -1,4 +1,6 @@
-﻿using Gallery.Data.Models;
+﻿using Gallery.Data.Managers;
+using Gallery.Data.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,48 +12,58 @@ namespace Gallery.Data.Repositories
 	public class ImageRepository : IImageRepository
 	{
 		private GalleryDataDbContext context;
+		private readonly IFileManager fileManager;
 
-		public ImageRepository(GalleryDataDbContext context)
+		public ImageRepository(GalleryDataDbContext context, IFileManager fileManager)
 		{
 			this.context = context;
+			this.fileManager = fileManager;
 		}
 
 		public IEnumerable<Image> Get()
 		{
-			return context.Images.Include(c => c.Tags).OrderBy(x => x.Title);
+			return context.Images.OrderBy(x => x.Title);
 		}
 
 		public IEnumerable<Image> GetWithTag(string tag)
 		{
-			return context.Images
-				.Include(c => c.Tags)
-				.Where(c => c.Tags
-					.Any(t => t.Title.Contains(tag)))
-				.OrderBy(x => x.Title);
+			return context.Images.Where(c => c.Tags.Contains(tag)).OrderBy(x => x.Title);
 		}
 
 		public Image Get(int id)
 		{
-			return context.Images.Include(c => c.Tags).FirstOrDefault(x => x.Id == id);
+			return context.Images.FirstOrDefault(x => x.Id == id);
 		}
 
 		public Image Get(string title)
 		{
-			return context.Images.Include(c => c.Tags).SingleOrDefault(x => x.Title == title);
+			return context.Images.SingleOrDefault(x => x.Title == title);
 		}
 
 		public void Create(Image entity)
 		{
+			entity.Created = DateTime.Now;
 			context.Images.Add(entity);
 		}
 
 		public void Create(string title)
 		{
-			if (context.Images.Count(x => x.Title == title.Trim()) == 0)
-				context.Images.Add(new Image() { Title = title.Trim() });
+			context.Images.Add(new Image() { Title = title.Trim(), Created = DateTime.Now });
+		}
+		public async Task Create(Image entity, IFormFile file)
+		{
+			if (file != null)
+				entity.Url = await fileManager.SaveImage(file);
+			context.Images.Add(entity);
 		}
 
-		public void Update(int id, Image entity)
+
+		public async void Update(int id, Image entity)
+		{
+			await Update(id, entity, null);
+		}
+
+		public async Task Update(int id, Image entity, IFormFile file)
 		{
 			if (entity == null)
 				throw new ArgumentNullException();
@@ -65,11 +77,14 @@ namespace Gallery.Data.Repositories
 
 			if (entity.Tags != null)
 				oldImage.Tags = entity.Tags;
+
+			if (file != null)
+				oldImage.Url = await fileManager.SaveOrCreateImage(oldImage.Url, entity.Url, file);
 		}
 
 		public bool Delete(int id)
 		{
-			Image image = context.Images.Include(c => c.Tags).FirstOrDefault(x => x.Id == id);
+			Image image = context.Images.FirstOrDefault(x => x.Id == id);
 			if (image != null)
 			{
 				context.Images.Remove(image);
@@ -83,6 +98,9 @@ namespace Gallery.Data.Repositories
 			Image image = this.Get(title);
 			if (image != null)
 			{
+				if (!string.IsNullOrEmpty(image.Url))
+					fileManager.DeleteImage(image.Url);
+
 				context.Images.Remove(image);
 				return true;
 			}

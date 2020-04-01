@@ -14,11 +14,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gallery.Data\Gallery.Data.csproj" />
-    <ProjectReference Include="..\Gallery.Services\Gallery.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Image\" />
+    <Folder Include="Views\Tags\" />
     <Folder Include="wwwroot\content\img\" />
   </ItemGroup>
 

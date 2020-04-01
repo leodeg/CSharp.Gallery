@@ -32,13 +32,16 @@ namespace Gallery.Data.Repositories
 
 		public void Create(Tag entity)
 		{
+			entity.Created = DateTime.Now;
 			context.Tags.Add(entity);
 		}
 
 		public void Create(string title)
 		{
 			if (context.Tags.Count(x => x.Title == title.Trim()) == 0)
-				context.Tags.Add(new Tag() { Title = title.Trim() });
+			{
+				context.Tags.Add(new Tag() { Title = title.Trim(), Created = DateTime.Now });
+			}
 		}
 
 		public void Update(int id, Tag entity)

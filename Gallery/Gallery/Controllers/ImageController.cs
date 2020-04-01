@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Gallery.Data.Models;
 using Gallery.Data.Repositories;
 using Gallery.Models;
-using Gallery.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +12,15 @@ namespace Gallery.Controllers
 {
 	public class ImageController : Controller
 	{
-		private readonly IImageService imageService;
+		private readonly IImageRepository imageRepository;
+		private readonly ITagRepository tagRepository;
 
-		public ImageController(IImageService imageService)
+		private readonly string ImageForm = "ImageForm";
+
+		public ImageController(IImageRepository imageRepository, ITagRepository tagRepository)
 		{
-			this.imageService = imageService;
+			this.imageRepository = imageRepository;
+			this.tagRepository = tagRepository;
 		}
 
 		public IActionResult Index()
@@ -25,9 +28,22 @@ namespace Gallery.Controllers
 			return View();
 		}
 
+		public IActionResult Details(int? id)
+		{
+			if (id == null)
+				return NotFound();
+
+			var image = imageRepository.Get(id.Value);
+			if (image == null)
+				return NotFound();
+
+			return View(image);
+		}
+
 		public IActionResult Create()
 		{
-			return View(new Image());
+			var model = new UploadImageModel();
+			return View(ImageForm, model);
 		}
 
 		public IActionResult Edit(int? id)
@@ -35,23 +51,52 @@ namespace Gallery.Controllers
 			if (id == null)
 				return NotFound();
 
-			var image = imageService.GetById(id.Value);
+			var image = imageRepository.Get(id.Value);
 			if (image == null)
 				return NotFound();
 
-			return View(image);
+			return View(ImageForm, image);
 		}
 
-		public IActionResult Save(Image image, IFormFile file)
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Save(IFormFile file, UploadImageModel model)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(image);
+				return View(ImageForm, model);
 			}
 
-			imageService.Save(image);
+			var image = new Image()
+			{
+				Id = model.Id,
+				Title = model.Title,
+				Tags = model.Tags
+			};
 
-			return View(image);
+			if (image == null)
+				throw new ArgumentNullException();
+
+			SaveTags(image);
+			await SaveImage(file, image);
+
+			await tagRepository.SaveAsync();
+			await imageRepository.SaveAsync();
+			return RedirectToAction(nameof(Index), nameof(Gallery));
+		}
+
+		private void SaveTags(Image image)
+		{
+			if (!string.IsNullOrEmpty(image.Tags))
+				foreach (var tag in image.TagsList)
+					tagRepository.Create(tag);
+		}
+
+		private async Task SaveImage(IFormFile file, Image image)
+		{
+			if (image.Id == 0)
+				await imageRepository.Create(image, file);
+			else await imageRepository.Update(image.Id, image, file);
 		}
 	}
 }

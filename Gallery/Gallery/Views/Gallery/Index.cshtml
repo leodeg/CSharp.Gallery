@@ -7,6 +7,8 @@
 <section id="gallery">
 	<div id="title" class="mx-auto text-center">
 		<h1>Gallery</h1>
+		<hr />
+		@await Component.InvokeAsync("TagCloud")
 	</div>
 	@if (Model.Images != null && Model.Images.Any())
 	{
@@ -14,10 +16,10 @@
 			@foreach (var image in Model.Images)
 			{
 				<div class="col-lg-3 col-md-4 col-6">
-					<a href="#" class="d-block mb-4 h-100">
+					<a asp-action="ImageDetails" asp-route-id="@image.Id" class="d-block mb-4 h-100">
 						@if (!string.IsNullOrEmpty(image.Url))
 						{
-							<div class="gallery-image img-thumbnail" style="background-image: url('~/content/img/@image.Url')"></div>
+							<div class="gallery-image img-thumbnail" style="background-image: url('/content/img/@image.Url')"></div>
 						}
 					</a>
 				</div>

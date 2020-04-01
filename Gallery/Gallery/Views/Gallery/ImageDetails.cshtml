@@ -1,0 +1,16 @@
+﻿@model Gallery.Data.Models.Image
+
+@{
+	ViewData["Title"] = "Details";
+}
+
+	<section id="image-details">
+		<h1>@Model.Title</h1>
+		<hr />
+		<img src="~/content/img/@Model.Url" alt="" />
+		<p>Created: @Model.Created.ToShortDateString()</p>
+		<p>Tags: @Model.Tags</p>
+		<br />
+		<a asp-controller="Gallery" asp-action="Index" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Back to Gallery</a>
+	</section>
+

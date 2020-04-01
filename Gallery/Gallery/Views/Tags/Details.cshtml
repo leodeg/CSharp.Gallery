@@ -1,0 +1,33 @@
+﻿@model Gallery.Data.Models.Tag
+
+@{
+	ViewData["Title"] = "Tag Details";
+}
+
+<h1 class="text-center mb-3">Tag Details</h1>
+
+<div>
+	<h4>Tag</h4>
+	<hr />
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Title)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Title)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Created)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Created)
+		</dd>
+	</dl>
+</div>
+<div>
+	<a asp-action="Index" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to List</a>
+	<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger"
+	   onclick="return confirm('Are you sure to delete this?');">
+		<i class="fas fa-edit"></i> Delete
+	</a>
+</div>
