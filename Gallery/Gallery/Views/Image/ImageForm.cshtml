@@ -5,8 +5,15 @@
 }
 
 <section id="upload-image">
+	@if (Model.Id == 0)
+	{
+		<h1 class="text-center">Upload Image</h1>
+	}
+	else
+	{
+		<h1 class="text-center">Edit @Model.Title</h1>
+	}
 
-	<h1 class="text-center">Upload Image</h1>
 	<h4>Image</h4>
 	<hr />
 	<div class="row">

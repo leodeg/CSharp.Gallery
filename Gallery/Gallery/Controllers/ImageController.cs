@@ -23,9 +23,10 @@ namespace Gallery.Controllers
 			this.tagRepository = tagRepository;
 		}
 
-		public IActionResult Index()
+		public IActionResult Index(string tag = "")
 		{
-			return View();
+			var model = string.IsNullOrEmpty(tag) ? imageRepository.Get() : imageRepository.GetWithTag(tag);
+			return View(model);
 		}
 
 		public IActionResult Details(int? id)
@@ -55,7 +56,14 @@ namespace Gallery.Controllers
 			if (image == null)
 				return NotFound();
 
-			return View(ImageForm, image);
+			var uploadModel = new UploadImageModel()
+			{
+				Id = image.Id,
+				Title = image.Title,
+				Tags = image.Tags
+			};
+
+			return View(ImageForm, uploadModel);
 		}
 
 		[HttpPost]
@@ -97,6 +105,17 @@ namespace Gallery.Controllers
 			if (image.Id == 0)
 				await imageRepository.Create(image, file);
 			else await imageRepository.Update(image.Id, image, file);
+		}
+
+		public async Task<IActionResult> Delete(int? id)
+		{
+			if (id == null)
+				return NotFound();
+
+			if (imageRepository.Delete(id.Value))
+				await imageRepository.SaveAsync();
+
+			return RedirectToAction(nameof(Index));
 		}
 	}
 }

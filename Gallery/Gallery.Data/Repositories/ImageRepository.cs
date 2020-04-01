@@ -73,7 +73,6 @@ namespace Gallery.Data.Repositories
 				throw new ArgumentOutOfRangeException("Can't find and update item with id: " + id);
 
 			oldImage.Title = entity.Title;
-			oldImage.Url = entity.Url;
 
 			if (entity.Tags != null)
 				oldImage.Tags = entity.Tags;
