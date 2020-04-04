@@ -20,14 +20,14 @@ namespace Gallery.Data
 		{
 			base.OnModelCreating(modelBuilder);
 
-			// Default Created Value
+			// Default Created dateTime value
 			modelBuilder.Entity<Album>().Property(a => a.Created).HasDefaultValueSql("GETDATE()");
 			modelBuilder.Entity<Image>().Property(i => i.Created).HasDefaultValueSql("GETDATE()");
 			modelBuilder.Entity<Tag>().Property(t => t.Created).HasDefaultValueSql("GETDATE()");
 
 			// Columns with unique values
-			modelBuilder.Entity<Album>().HasAlternateKey(a => a.Title);
-			modelBuilder.Entity<Tag>().HasAlternateKey(t => t.Title);
+			modelBuilder.Entity<Album>().HasIndex(a => a.Title).IsUnique();
+			modelBuilder.Entity<Tag>().HasIndex(t => t.Title).IsUnique();
 
 			// Images' albums primary key
 			modelBuilder.Entity<AlbumImage>()

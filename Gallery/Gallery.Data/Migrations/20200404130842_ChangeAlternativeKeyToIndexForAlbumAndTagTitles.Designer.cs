@@ -4,14 +4,16 @@ using Gallery.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Gallery.Data.Migrations
 {
     [DbContext(typeof(GalleryDataDbContext))]
-    partial class GalleryDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200404130842_ChangeAlternativeKeyToIndexForAlbumAndTagTitles")]
+    partial class ChangeAlternativeKeyToIndexForAlbumAndTagTitles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
