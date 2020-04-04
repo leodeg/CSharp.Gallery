@@ -16,9 +16,23 @@ namespace Gallery.Data.Repositories
 		{
 		}
 
+		/// <summary>
+		/// Include Album Images and Album Entities
+		/// </summary>
+		/// <param name="id">Image id</param>
+		public override Image Get(int id)
+		{
+			return dbSet.Include(c => c.AlbumImages).ThenInclude(c => c.Album).FirstOrDefault(c => c.Id == id);
+		}
+
+		public override IEnumerable<Image> Get()
+		{
+			return dbSet.Include(c => c.AlbumImages);
+		}
+
 		public IEnumerable<Image> GetWithTag(string tag)
 		{
-			return dbSet.Where(c => c.Tags.Contains(tag)).OrderBy(x => x.Title);
+			return dbSet.Include(c => c.AlbumImages).Where(c => c.Tags.Contains(tag)).OrderBy(x => x.Title);
 		}
 
 		public Image Get(string title)
@@ -62,14 +76,23 @@ namespace Gallery.Data.Repositories
 
 		public void AddAlbum(Image image, Album album)
 		{
-			context.AlbumImages.Add(new AlbumImage { Image = image, Album = album });
+			context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
 		}
 
 		public void AddAlbums(Image image, IEnumerable<Album> albums)
 		{
 			foreach (var album in albums)
 			{
-				context.AlbumImages.Add(new AlbumImage { Image = image, Album = album });
+				context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
+			}
+		}
+
+		public void AddAlbums(Image image, IEnumerable<int> albums)
+		{
+			var albumsEntities = context.Albums.Where(a => albums.Contains(a.Id));
+			foreach (var album in albumsEntities)
+			{
+				context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
 			}
 		}
 
@@ -84,9 +107,9 @@ namespace Gallery.Data.Repositories
 			return false;
 		}
 
-		public bool RemoveAlbums(Image image, IEnumerable<int> ids)
+		public bool RemoveAlbums(Image image, IEnumerable<int> albums)
 		{
-			var album = context.AlbumImages.Where(a => a.ImageId == image.Id && ids.Contains(a.AlbumId));
+			var album = context.AlbumImages.Where(a => a.ImageId == image.Id && albums.Contains(a.AlbumId));
 			if (album != null)
 			{
 				context.AlbumImages.RemoveRange(album);

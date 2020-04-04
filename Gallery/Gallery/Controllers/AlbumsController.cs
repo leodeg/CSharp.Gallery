@@ -56,7 +56,7 @@ namespace Gallery.Controllers
 
 				await albumsRepository.SaveChangesAsync();
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				// TODO: show warning about duplicate
 				return RedirectToAction(nameof(Index));

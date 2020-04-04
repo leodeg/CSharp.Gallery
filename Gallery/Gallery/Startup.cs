@@ -35,6 +35,7 @@ namespace Gallery
 			services.AddTransient<TagRepository, TagRepository>();
 			services.AddTransient<ImageRepository, ImageRepository>();
 			services.AddTransient<AlbumsRepository, AlbumsRepository>();
+			services.AddTransient<AlbumsImagesRepository, AlbumsImagesRepository>();
 			services.AddTransient<IFileManager, FileManager>();
 
 			services.AddControllersWithViews();

@@ -15,13 +15,17 @@ namespace Gallery.Controllers
 	{
 		private readonly ImageRepository imageRepository;
 		private readonly TagRepository tagRepository;
+		private readonly AlbumsRepository albumsRepository;
+		private readonly AlbumsImagesRepository albumsImagesRepository;
 		private readonly IFileManager fileManager;
 		private readonly string ImageForm = "ImageForm";
 
-		public ImageController(ImageRepository imageRepository, TagRepository tagRepository, IFileManager fileManager)
+		public ImageController(ImageRepository imageRepository, TagRepository tagRepository, AlbumsRepository albumsRepository, AlbumsImagesRepository albumsImagesRepository, IFileManager fileManager)
 		{
 			this.imageRepository = imageRepository;
 			this.tagRepository = tagRepository;
+			this.albumsRepository = albumsRepository;
+			this.albumsImagesRepository = albumsImagesRepository;
 			this.fileManager = fileManager;
 		}
 
@@ -46,6 +50,8 @@ namespace Gallery.Controllers
 		public IActionResult Create()
 		{
 			var model = new UploadImageModel();
+			model.AllAlbums = albumsRepository.Get();
+			model.Albums = new List<string>();
 			return View(ImageForm, model);
 		}
 
@@ -63,7 +69,9 @@ namespace Gallery.Controllers
 				Id = image.Id,
 				Title = image.Title,
 				Tags = image.Tags,
-				Url = image.Url
+				Url = image.Url,
+				AllAlbums = albumsRepository.Get(),
+				Albums = image.AlbumImages.Select(a => a.Album.Title).ToList()
 			};
 
 			return View(ImageForm, uploadModel);
@@ -71,7 +79,7 @@ namespace Gallery.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Save(IFormFile file, UploadImageModel model)
+		public async Task<IActionResult> Save(IFormFile file, UploadImageModel model, List<int> albums)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -90,7 +98,7 @@ namespace Gallery.Controllers
 				throw new ArgumentNullException();
 
 			SaveTags(image);
-			await SaveImage(file, image);
+			await SaveImage(file, image, albums);
 			await imageRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index), nameof(Gallery));
@@ -103,8 +111,20 @@ namespace Gallery.Controllers
 					tagRepository.Create(tag);
 		}
 
-		private async Task SaveImage(IFormFile file, Image image)
+		private async Task SaveImage(IFormFile file, Image image, List<int> albums)
 		{
+			if (image != null && albums != null)
+			{
+				var imageAlbums = albumsImagesRepository.Get().Where(i => i.ImageId == image.Id);
+				var allAlbums = albumsRepository.Get();
+
+				var addedAlbums = albums.Except(imageAlbums.Select(i => i.AlbumId));
+				var removedAlbums = imageAlbums.Select(i => i.AlbumId).Except(albums);
+
+				imageRepository.AddAlbums(image, addedAlbums);
+				imageRepository.RemoveAlbums(image, removedAlbums);
+			}
+
 			if (image.Id == 0)
 			{
 				if (file != null)

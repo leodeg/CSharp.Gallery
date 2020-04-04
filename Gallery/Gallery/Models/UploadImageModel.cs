@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Gallery.Data.Models;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gallery.Models
@@ -11,5 +13,8 @@ namespace Gallery.Models
 		public string Title { get; set; }
 		public string Tags { get; set; }
 		public string Url { get; set; }
+
+		public IEnumerable<Album> AllAlbums { get; set; }
+		public IEnumerable<string> Albums { get; set; }
 	}
 }

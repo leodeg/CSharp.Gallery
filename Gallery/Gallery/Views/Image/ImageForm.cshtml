@@ -20,7 +20,7 @@
 		<div class="col-md-12">
 			<form asp-action="Save" method="post" enctype="multipart/form-data">
 				<div class="row">
-					<div class="col-md-4">
+					<div class="col-md-4 mb-3">
 						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 						<div class="form-group">
 							<label asp-for="Title" class="control-label"></label>
@@ -36,6 +36,13 @@
 							<label class="control-label">Image</label>
 							<input type="file" id="file" name="file" class="form-control" />
 						</div>
+						<h4>Albums</h4>
+						<hr />
+						@foreach (var album in Model.AllAlbums)
+						{
+							<input type="checkbox" name="albums" value="@album.Id"
+								   @(Model.Albums.Contains(album.Title) ? "checked=\"checked\"" : "") />@album.Title <br />
+							}
 					</div>
 					<div class="col-md-8 text-center mb-3">
 						@if (!string.IsNullOrEmpty(Model.Url))

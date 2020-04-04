@@ -11,7 +11,7 @@ namespace Gallery.Data.Repositories
 	{
 		TEntity Get(int id);
 		IEnumerable<TEntity> Get();
-		IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> predicate);
+		IEnumerable<TEntity> Get(Func<TEntity, bool> predicate);
 		void Create(TEntity entity);
 		void Update(int id, TEntity entity);
 		void Remove(int id);
