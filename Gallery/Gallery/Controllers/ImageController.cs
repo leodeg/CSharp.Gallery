@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Gallery.Data.Managers;
 using Gallery.Data.Models;
 using Gallery.Data.Repositories;
 using Gallery.Models;
@@ -12,15 +13,16 @@ namespace Gallery.Controllers
 {
 	public class ImageController : Controller
 	{
-		private readonly IImageRepository imageRepository;
-		private readonly ITagRepository tagRepository;
-
+		private readonly ImageRepository imageRepository;
+		private readonly TagRepository tagRepository;
+		private readonly IFileManager fileManager;
 		private readonly string ImageForm = "ImageForm";
 
-		public ImageController(IImageRepository imageRepository, ITagRepository tagRepository)
+		public ImageController(ImageRepository imageRepository, TagRepository tagRepository, IFileManager fileManager)
 		{
 			this.imageRepository = imageRepository;
 			this.tagRepository = tagRepository;
+			this.fileManager = fileManager;
 		}
 
 		public IActionResult Index(string tag = "")
@@ -60,7 +62,8 @@ namespace Gallery.Controllers
 			{
 				Id = image.Id,
 				Title = image.Title,
-				Tags = image.Tags
+				Tags = image.Tags,
+				Url = image.Url
 			};
 
 			return View(ImageForm, uploadModel);
@@ -79,7 +82,8 @@ namespace Gallery.Controllers
 			{
 				Id = model.Id,
 				Title = model.Title,
-				Tags = model.Tags
+				Tags = model.Tags,
+				Url = model.Url
 			};
 
 			if (image == null)
@@ -87,9 +91,8 @@ namespace Gallery.Controllers
 
 			SaveTags(image);
 			await SaveImage(file, image);
+			await imageRepository.SaveChangesAsync();
 
-			await tagRepository.SaveAsync();
-			await imageRepository.SaveAsync();
 			return RedirectToAction(nameof(Index), nameof(Gallery));
 		}
 
@@ -103,8 +106,20 @@ namespace Gallery.Controllers
 		private async Task SaveImage(IFormFile file, Image image)
 		{
 			if (image.Id == 0)
-				await imageRepository.Create(image, file);
-			else await imageRepository.Update(image.Id, image, file);
+			{
+				if (file != null)
+					image.Url = await fileManager.SaveImage(file);
+				imageRepository.Create(image);
+			}
+			else
+			{
+				if (file != null)
+				{
+					fileManager.DeleteImage(image.Url);
+					image.Url = await fileManager.SaveImage(file);
+				}
+				imageRepository.Update(image.Id, image);
+			}
 		}
 
 		public async Task<IActionResult> Delete(int? id)
@@ -112,8 +127,12 @@ namespace Gallery.Controllers
 			if (id == null)
 				return NotFound();
 
-			if (imageRepository.Delete(id.Value))
-				await imageRepository.SaveAsync();
+			var image = imageRepository.Get(id.Value);
+			if (!string.IsNullOrEmpty(image.Url))
+				fileManager.DeleteImage(image.Url);
+
+			imageRepository.Remove(imageRepository.Get(id.Value));
+			await imageRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index));
 		}

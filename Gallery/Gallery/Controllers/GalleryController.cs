@@ -12,9 +12,9 @@ namespace Gallery.Controllers
 {
 	public class GalleryController : Controller
 	{
-		private readonly IImageRepository imageRepository;
+		private readonly ImageRepository imageRepository;
 
-		public GalleryController(IImageRepository imageRepository)
+		public GalleryController(ImageRepository imageRepository)
 		{
 			this.imageRepository = imageRepository;
 		}

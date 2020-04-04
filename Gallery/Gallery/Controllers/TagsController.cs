@@ -9,9 +9,9 @@ namespace Gallery.Controllers
 {
 	public class TagsController : Controller
 	{
-		private readonly ITagRepository tagRepository;
+		private readonly TagRepository tagRepository;
 
-		public TagsController(ITagRepository tagRepository)
+		public TagsController(TagRepository tagRepository)
 		{
 			this.tagRepository = tagRepository;
 		}
@@ -38,8 +38,8 @@ namespace Gallery.Controllers
 			if (id == null)
 				return NotFound();
 
-			if (tagRepository.Delete(id.Value))
-				await tagRepository.SaveAsync();
+			tagRepository.Remove(id.Value);
+			await tagRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index));
 		}

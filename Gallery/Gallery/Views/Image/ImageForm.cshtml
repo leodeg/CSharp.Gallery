@@ -17,32 +17,42 @@
 	<h4>Image</h4>
 	<hr />
 	<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-12">
 			<form asp-action="Save" method="post" enctype="multipart/form-data">
-				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-				<div class="form-group">
-					<label asp-for="Title" class="control-label"></label>
-					<input asp-for="Title" class="form-control" />
-					<span asp-validation-for="Title" class="text-danger"></span>
-				</div>
-				<div class="form-group">
-					<label asp-for="Tags" class="control-label"></label>
-					<input asp-for="Tags" class="form-control" />
-					<span asp-validation-for="Tags" class="text-danger"></span>
-				</div>
-				<div class="form-group">
-					<label class="control-label">Image</label>
-					<input type="file" id="file" name="file" class="form-control" />
+				<div class="row">
+					<div class="col-md-4">
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+						<div class="form-group">
+							<label asp-for="Title" class="control-label"></label>
+							<input asp-for="Title" class="form-control" />
+							<span asp-validation-for="Title" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<label asp-for="Tags" class="control-label"></label>
+							<input asp-for="Tags" class="form-control" />
+							<span asp-validation-for="Tags" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Image</label>
+							<input type="file" id="file" name="file" class="form-control" />
+						</div>
+					</div>
+					<div class="col-md-8 text-center mb-3">
+						@if (!string.IsNullOrEmpty(Model.Url))
+						{
+							<img src="~/content/img/@Model.Url" alt="Preview" style="max-height: 300px; width: auto;" />
+						}
+					</div>
 				</div>
 
 				<input type="hidden" asp-for="Id" value="@Model.Id" />
+				<input type="hidden" asp-for="Url" value="@Model.Url" />
 				<div class="form-group">
-					<input type="submit" value="Create" class="btn btn-danger" />
+					<input type="submit" value="Create" class="btn btn-danger btn-block" />
 				</div>
 			</form>
 		</div>
 	</div>
-
 	<div>
 		<a asp-action="Index" asp-controller="Gallery" class="btn btn-danger">Back to Gallery</a>
 	</div>
