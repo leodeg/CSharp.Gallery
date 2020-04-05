@@ -8,6 +8,7 @@ using Gallery.Data.Repositories;
 using Gallery.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gallery.Controllers
 {
@@ -17,6 +18,7 @@ namespace Gallery.Controllers
 		private readonly TagRepository tagRepository;
 		private readonly AlbumsRepository albumsRepository;
 		private readonly AlbumsImagesRepository albumsImagesRepository;
+
 		private readonly IFileManager fileManager;
 		private readonly string ImageForm = "ImageForm";
 
@@ -60,7 +62,7 @@ namespace Gallery.Controllers
 			if (id == null)
 				return NotFound();
 
-			var image = imageRepository.Get(id.Value);
+			var image = imageRepository.GetWithAlbums(id.Value);
 			if (image == null)
 				return NotFound();
 
@@ -71,7 +73,7 @@ namespace Gallery.Controllers
 				Tags = image.Tags,
 				Url = image.Url,
 				AllAlbums = albumsRepository.Get(),
-				Albums = image.AlbumImages.Select(a => a.Album.Title).ToList()
+				Albums = albumsImagesRepository.GetAlbumsTitlesWithImage(image.Id)
 			};
 
 			return View(ImageForm, uploadModel);
@@ -94,37 +96,32 @@ namespace Gallery.Controllers
 				Url = model.Url
 			};
 
-			if (image == null)
-				throw new ArgumentNullException();
+			if (!string.IsNullOrEmpty(image.Tags))
+				tagRepository.Create(image.TagsList);
 
-			SaveTags(image);
-			await SaveImage(file, image, albums);
+			SaveAlbums(image, albums);
+			await SaveImage(file, image);
 			await imageRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index), nameof(Gallery));
 		}
 
-		private void SaveTags(Image image)
+		private void SaveAlbums(Image image, List<int> albumsIds)
 		{
-			if (!string.IsNullOrEmpty(image.Tags))
-				foreach (var tag in image.TagsList)
-					tagRepository.Create(tag);
+			if (image != null && albumsIds != null)
+			{
+				IEnumerable<int> imageAlbumsIds = albumsImagesRepository.GetAlbumsIdsWithImage(image.Id);
+
+				IEnumerable<int> addedAlbumsIds = albumsIds.Except(imageAlbumsIds);
+				IEnumerable<int> removedAlbumsIds = imageAlbumsIds.Except(albumsIds);
+
+				imageRepository.AddToAlbums(image, addedAlbumsIds);
+				imageRepository.RemoveFromAlbums(image, removedAlbumsIds);
+			}
 		}
 
-		private async Task SaveImage(IFormFile file, Image image, List<int> albums)
+		private async Task SaveImage(IFormFile file, Image image)
 		{
-			if (image != null && albums != null)
-			{
-				var imageAlbums = albumsImagesRepository.Get().Where(i => i.ImageId == image.Id);
-				var allAlbums = albumsRepository.Get();
-
-				var addedAlbums = albums.Except(imageAlbums.Select(i => i.AlbumId));
-				var removedAlbums = imageAlbums.Select(i => i.AlbumId).Except(albums);
-
-				imageRepository.AddAlbums(image, addedAlbums);
-				imageRepository.RemoveAlbums(image, removedAlbums);
-			}
-
 			if (image.Id == 0)
 			{
 				if (file != null)
@@ -148,10 +145,13 @@ namespace Gallery.Controllers
 				return NotFound();
 
 			var image = imageRepository.Get(id.Value);
+			if (image == null)
+				return NotFound();
+
 			if (!string.IsNullOrEmpty(image.Url))
 				fileManager.DeleteImage(image.Url);
 
-			imageRepository.Remove(imageRepository.Get(id.Value));
+			imageRepository.Remove(id.Value);
 			await imageRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index));

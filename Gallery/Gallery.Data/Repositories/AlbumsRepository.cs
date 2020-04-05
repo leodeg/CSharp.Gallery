@@ -1,4 +1,5 @@
 ﻿using Gallery.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,16 @@ namespace Gallery.Data.Repositories
 	{
 		public AlbumsRepository(GalleryDataDbContext context) : base(context)
 		{
+		}
+
+		public Album GetWithImages(int id)
+		{
+			return context.Albums.Include(album => album.AlbumImages).ThenInclude(albumImages => albumImages.Image).FirstOrDefault(album => album.Id == id);
+		}
+
+		public IEnumerable<Album> GetWithImages()
+		{
+			return context.Albums.Include(album => album.AlbumImages).ThenInclude(albumImages => albumImages.Image);
 		}
 
 		public override void Update(int id, Album entity)

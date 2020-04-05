@@ -12,15 +12,22 @@ namespace Gallery.Data.Repositories
 {
 	public class ImageRepository : Repository<Image>
 	{
-		public ImageRepository(GalleryDataDbContext context) : base(context)
+		private readonly AlbumsImagesRepository albumsImagesRepository;
+
+		public ImageRepository(GalleryDataDbContext context, AlbumsImagesRepository albumsImagesRepository) : base(context)
 		{
+			this.albumsImagesRepository = albumsImagesRepository;
+		}
+
+		public override Image Get(int id)
+		{
+			return dbSet.FirstOrDefault(c => c.Id == id);
 		}
 
 		/// <summary>
-		/// Include Album Images and Album Entities
+		/// Include Albums with current image.
 		/// </summary>
-		/// <param name="id">Image id</param>
-		public override Image Get(int id)
+		public Image GetWithAlbums(int id)
 		{
 			return dbSet.Include(c => c.AlbumImages).ThenInclude(c => c.Album).FirstOrDefault(c => c.Id == id);
 		}
@@ -70,52 +77,39 @@ namespace Gallery.Data.Repositories
 			return false;
 		}
 
-		// ------------------------------------
-		// -------------- ALBUMS --------------
-		// ------------------------------------
-
-		public void AddAlbum(Image image, Album album)
+		public void AddToAlbum(Image image, Album album)
 		{
-			context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
+			albumsImagesRepository.AddImageToAlbum(image, album);
 		}
 
-		public void AddAlbums(Image image, IEnumerable<Album> albums)
+		public void AddToAlbums(Image image, IEnumerable<Album> albums)
 		{
-			foreach (var album in albums)
-			{
-				context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
-			}
+			albumsImagesRepository.AddImageToAlbums(image, albums);
 		}
 
-		public void AddAlbums(Image image, IEnumerable<int> albums)
+		public IEnumerable<string> GetAlbumsTitles (int imageId)
 		{
-			var albumsEntities = context.Albums.Where(a => albums.Contains(a.Id));
-			foreach (var album in albumsEntities)
-			{
-				context.AlbumImages.Add(new AlbumImage { ImageId = image.Id, AlbumId = album.Id });
-			}
+			return albumsImagesRepository.GetAlbumsTitlesWithImage(imageId);
 		}
 
-		public bool RemoveAlbum(Image image, int id)
+		public void AddToAlbums(Image image, IEnumerable<int> albumsIds)
 		{
-			var album = context.AlbumImages.FirstOrDefault(a => a.ImageId == image.Id && a.AlbumId == id);
-			if (album != null)
-			{
-				context.AlbumImages.Remove(album);
-				return true;
-			}
-			return false;
+			albumsImagesRepository.AddImageToAlbums(image, albumsIds);
 		}
 
-		public bool RemoveAlbums(Image image, IEnumerable<int> albums)
+		public bool RemoveFromAlbum(Image image, int id)
 		{
-			var album = context.AlbumImages.Where(a => a.ImageId == image.Id && albums.Contains(a.AlbumId));
-			if (album != null)
-			{
-				context.AlbumImages.RemoveRange(album);
-				return true;
-			}
-			return false;
+			return albumsImagesRepository.RemoveImageFromAlbum(image, id);
+		}
+
+		public bool RemoveFromAlbums(Image image, IEnumerable<int> albums)
+		{
+			return albumsImagesRepository.RemoveImageFromAlbums(image, albums);
+		}
+
+		public void RemoveFromAllAlbums(int imageId)
+		{
+			albumsImagesRepository.RemoveImageFromAllAlbums(imageId);
 		}
 	}
 }

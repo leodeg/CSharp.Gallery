@@ -25,6 +25,14 @@ namespace Gallery.Data.Repositories
 			}
 		}
 
+		public void Create(IEnumerable<string> titles)
+		{
+			foreach (string title in titles)
+			{
+				Create(title);
+			}
+		}
+
 		public override void Update(int id, Tag entity)
 		{
 			if (entity == null)
