@@ -13,18 +13,26 @@ namespace Gallery.Controllers
 	public class GalleryController : Controller
 	{
 		private readonly ImageRepository imageRepository;
+		private readonly AlbumsImagesRepository albumsImagesRepository;
 
-		public GalleryController(ImageRepository imageRepository)
+		public GalleryController(ImageRepository imageRepository, AlbumsImagesRepository albumsImagesRepository)
 		{
 			this.imageRepository = imageRepository;
+			this.albumsImagesRepository = albumsImagesRepository;
 		}
 
-		public IActionResult Index(string tag = "")
+		public IActionResult Index(int? albumId, string tag = "")
 		{
-			var model = new GalleryIndexViewModel()
+			var model = new GalleryIndexViewModel();
+
+			if (albumId != null)
 			{
-				Images = string.IsNullOrEmpty(tag) ? imageRepository.Get() : imageRepository.GetWithTag(tag)
-			};
+				model.Images = albumsImagesRepository.GetImagesFromAlbum(albumId.Value);
+			}
+			else
+			{
+				model.Images = string.IsNullOrEmpty(tag) ? imageRepository.Get() : imageRepository.GetWithTag(tag);
+			}
 
 			return View(model);
 		}
