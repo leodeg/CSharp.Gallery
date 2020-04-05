@@ -36,13 +36,16 @@
 							<label class="control-label">Image</label>
 							<input type="file" id="file" name="file" class="form-control" />
 						</div>
-						<h4>Albums</h4>
-						<hr />
-						@foreach (var album in Model.AllAlbums)
-						{
-							<input type="checkbox" name="albums" value="@album.Id"
-								   @(Model.Albums.Contains(album.Title) ? "checked=\"checked\"" : "") />@album.Title <br />
-							}
+
+						<div class="form-group mt-5">
+							<h4>Albums</h4>
+							<hr />
+							@foreach (var album in Model.AllAlbums)
+							{
+								<input type="checkbox" name="albums" value="@album.Id"
+									   @(Model.Albums.Contains(album.Title) ? "checked=\"checked\"" : "") />@album.Title <br />
+								}
+						</div>
 					</div>
 					<div class="col-md-8 text-center mb-3">
 						@if (!string.IsNullOrEmpty(Model.Url))

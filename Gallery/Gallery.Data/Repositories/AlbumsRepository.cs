@@ -14,6 +14,11 @@ namespace Gallery.Data.Repositories
 		{
 		}
 
+		public string GetAlbumTitle(int id)
+		{
+			return context.Albums.FirstOrDefault(album => album.Id == id).Title;
+		}
+
 		public Album GetWithImages(int id)
 		{
 			return context.Albums.Include(album => album.AlbumImages).ThenInclude(albumImages => albumImages.Image).FirstOrDefault(album => album.Id == id);

@@ -9,15 +9,15 @@
 				<div class="col-lg-3 col-md-4 col-6 mb-3">
 					<div class="card border-0">
 						<div class="card-header bg-dark text-white">
-							<a asp-controller="Gallery" asp-action="Index" asp-route-albumId="@album.Id" class="text-white">
+							<a asp-action="Album" asp-route-albumId="@album.Id" class="text-white">
 								<h4 class="text-white mb-1">@album.Title</h4>
 							</a>
 							<p class="small mb-1">Projects: @album.ImageCount</p>
 						</div>
-						<a asp-controller="Gallery" asp-action="Index" asp-route-albumId="@album.Id" class="d-block h-100">
+						<a asp-action="Album" asp-route-albumId="@album.Id" class="d-block h-100">
 							@if (!string.IsNullOrEmpty(album.ImageUrl))
 							{
-								<div class="gallery-image img-thumbnail" style="background-image: url('/content/img/@album.ImageUrl')"></div>
+								<div class="gallery-album-image img-thumbnail" style="background-image: url('/content/img/@album.ImageUrl')"></div>
 							}
 						</a>
 					</div>
