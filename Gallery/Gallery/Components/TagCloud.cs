@@ -9,9 +9,9 @@ namespace Blog.Components
 {
 	public class TagCloud : ViewComponent
 	{
-		private readonly ITagRepository tagRepository;
+		private readonly TagRepository tagRepository;
 
-		public TagCloud(ITagRepository tagRepository)
+		public TagCloud(TagRepository tagRepository)
 		{
 			this.tagRepository = tagRepository;
 		}

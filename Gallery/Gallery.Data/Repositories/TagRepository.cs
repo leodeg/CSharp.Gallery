@@ -6,34 +6,15 @@ using System.Threading.Tasks;
 
 namespace Gallery.Data.Repositories
 {
-	public class TagRepository : ITagRepository
+	public class TagRepository : Repository<Tag>
 	{
-		private GalleryDataDbContext context;
-
-		public TagRepository(GalleryDataDbContext context)
+		public TagRepository(GalleryDataDbContext context) : base(context)
 		{
-			this.context = context;
-		}
-
-		public IEnumerable<Tag> Get()
-		{
-			return context.Tags.OrderBy(x => x.Title);
-		}
-
-		public Tag Get(int id)
-		{
-			return context.Tags.FirstOrDefault(x => x.Id == id);
 		}
 
 		public Tag Get(string title)
 		{
 			return context.Tags.SingleOrDefault(x => x.Title == title);
-		}
-
-		public void Create(Tag entity)
-		{
-			entity.Created = DateTime.Now;
-			context.Tags.Add(entity);
 		}
 
 		public void Create(string title)
@@ -44,7 +25,15 @@ namespace Gallery.Data.Repositories
 			}
 		}
 
-		public void Update(int id, Tag entity)
+		public void Create(IEnumerable<string> titles)
+		{
+			foreach (string title in titles)
+			{
+				Create(title);
+			}
+		}
+
+		public override void Update(int id, Tag entity)
 		{
 			if (entity == null)
 				throw new ArgumentNullException();
@@ -56,18 +45,7 @@ namespace Gallery.Data.Repositories
 			oldTag.Title = entity.Title;
 		}
 
-		public bool Delete(int id)
-		{
-			Tag tag = context.Tags.FirstOrDefault(x => x.Id == id);
-			if (tag != null)
-			{
-				context.Tags.Remove(tag);
-				return true;
-			}
-			return false;
-		}
-
-		public bool Delete(string title)
+		public bool Remove(string title)
 		{
 			Tag tagToDelete = Get(title);
 			if (tagToDelete != null)
@@ -76,32 +54,6 @@ namespace Gallery.Data.Repositories
 				return true;
 			}
 			return false;
-		}
-
-		public async Task<bool> SaveAsync()
-		{
-			if (await context.SaveChangesAsync() > 0)
-				return true;
-			return false;
-		}
-
-		private bool disposed = false;
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!this.disposed)
-			{
-				if (disposing)
-				{
-					context.Dispose();
-				}
-			}
-			this.disposed = true;
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
 		}
 	}
 }

@@ -1,0 +1,33 @@
+﻿@model GalleryAlbumViewModel
+
+@{
+	ViewData["Title"] = "@Model.AlbumTitle";
+}
+
+<section id="gallery">
+	<div id="title" class="mx-auto text-center">
+		<h1>@Model.AlbumTitle</h1>
+		<hr />
+	</div>
+	@if (Model.Images != null && Model.Images.Any())
+	{
+		<div class="row">
+			@foreach (var image in Model.Images)
+			{
+				<div class="col-lg-3 col-md-4 col-6 px-0">
+					<a asp-action="ImageDetails" asp-route-id="@image.Id" class="d-block mb-4 h-100">
+						@if (!string.IsNullOrEmpty(image.Url))
+						{
+							<div class="gallery-image img-thumbnail" style="background-image: url('/content/img/@image.Url')"></div>
+						}
+					</a>
+				</div>
+			}
+		</div>
+	}
+	else
+	{
+		<h2 class="text-center">No Images Found</h2>
+	}
+</section>
+

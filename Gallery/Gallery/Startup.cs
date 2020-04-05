@@ -32,12 +32,10 @@ namespace Gallery
 				options.UseSqlServer(
 					Configuration.GetConnectionString("DefaultConnection")));
 
-			services.AddTransient<IRepository<Tag>, TagRepository>();
-			services.AddTransient<ITagRepository, TagRepository>();
-
-			services.AddTransient<IRepository<Image>, ImageRepository>();
-			services.AddTransient<IImageRepository, ImageRepository>();
-
+			services.AddTransient<TagRepository, TagRepository>();
+			services.AddTransient<ImageRepository, ImageRepository>();
+			services.AddTransient<AlbumsRepository, AlbumsRepository>();
+			services.AddTransient<AlbumsImagesRepository, AlbumsImagesRepository>();
 			services.AddTransient<IFileManager, FileManager>();
 
 			services.AddControllersWithViews();

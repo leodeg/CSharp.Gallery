@@ -15,7 +15,7 @@
 		<div class="row">
 			@foreach (var image in Model.Images)
 			{
-				<div class="col-lg-3 col-md-4 col-6">
+				<div class="col-lg-3 col-md-4 col-6 px-0">
 					<a asp-action="ImageDetails" asp-route-id="@image.Id" class="d-block mb-4 h-100">
 						@if (!string.IsNullOrEmpty(image.Url))
 						{
@@ -28,7 +28,7 @@
 	}
 	else
 	{
-		<h2>No Images Found</h2>
+		<h2 class="text-center">No Images Found</h2>
 	}
 </section>
 

@@ -4,13 +4,15 @@
 	ViewData["Title"] = "Details";
 }
 
-	<section id="image-details">
-		<h1>@Model.Title</h1>
-		<hr />
-		<img src="~/content/img/@Model.Url" alt="" />
-		<p>Created: @Model.Created.ToShortDateString()</p>
-		<p>Tags: @Model.Tags</p>
-		<br />
-		<a asp-controller="Gallery" asp-action="Index" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Back to Gallery</a>
-	</section>
+<section id="image-details">
+	<h1>@Model.Title</h1>
+	<p class="small mb-1">Created: @Model.Created.ToShortDateString()</p>
+	<p class="small mb-1">Tags: @Model.Tags</p>
+	<hr />
+	<div class="mb-3">
+		<img class="img-fluid" src="~/content/img/@Model.Url" alt="" />
+	</div>
+	<a asp-controller="Gallery" asp-action="Index" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Back to Gallery</a>
+	<a asp-controller="Image" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</a>
+</section>
 
