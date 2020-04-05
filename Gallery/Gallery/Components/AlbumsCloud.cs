@@ -29,7 +29,7 @@ namespace Blog.Components
 
 		public IEnumerable<AlbumWithImage> GetAlbums()
 		{
-			var albums = albumsRepository.GetWithImages();
+			var albums = albumsRepository.GetNotEmptyWithImages();
 			List<AlbumWithImage> albumsWithImages = new List<AlbumWithImage>();
 
 			foreach (var album in albums)

@@ -24,6 +24,11 @@ namespace Gallery.Data.Repositories
 			return context.Albums.Include(album => album.AlbumImages).ThenInclude(albumImages => albumImages.Image);
 		}
 
+		public IEnumerable<Album> GetNotEmptyWithImages()
+		{
+			return context.Albums.Include(album => album.AlbumImages).ThenInclude(albumImages => albumImages.Image).Where(a => a.AlbumImages.Count() > 0);
+		}
+
 		public override void Update(int id, Album entity)
 		{
 			if (entity == null)

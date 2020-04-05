@@ -99,8 +99,10 @@ namespace Gallery.Controllers
 			if (!string.IsNullOrEmpty(image.Tags))
 				tagRepository.Create(image.TagsList);
 
-			SaveAlbums(image, albums);
 			await SaveImage(file, image);
+			await imageRepository.SaveChangesAsync();
+
+			SaveAlbums(image, albums);
 			await imageRepository.SaveChangesAsync();
 
 			return RedirectToAction(nameof(Index), nameof(Gallery));
