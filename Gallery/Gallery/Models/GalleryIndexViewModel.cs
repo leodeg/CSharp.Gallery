@@ -9,5 +9,6 @@ namespace Gallery.Models
 	public class GalleryIndexViewModel
 	{
 		public IEnumerable<Image> Images { get; set; }
+		public PagingInformation PagingInformation { get; set; }
 	}
 }

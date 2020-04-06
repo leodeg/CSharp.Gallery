@@ -11,5 +11,6 @@ namespace Gallery.Models
 	{
 		public string AlbumTitle { get; set; }
 		public IEnumerable<Image> Images { get; set; }
+		public PagingInformation PagingInformation { get; set; }
 	}
 }

@@ -17,6 +17,8 @@ namespace Gallery.Controllers
 		private readonly AlbumsRepository albumsRepository;
 		private readonly ImageRepository imageRepository;
 
+		private readonly int ItemsPerPage = 40;
+
 		public GalleryAlbumsController(AlbumsImagesRepository albumsImagesRepository, AlbumsRepository albumsRepository, ImageRepository imageRepository)
 		{
 			this.albumsImagesRepository = albumsImagesRepository;
@@ -29,15 +31,27 @@ namespace Gallery.Controllers
 			return View();
 		}
 
-		public IActionResult Album(int? albumId)
+		public IActionResult Album(int? albumId, int page = 1)
 		{
 			if (albumId == null)
 				return NotFound();
 
+			IEnumerable<Image> images = albumsImagesRepository.GetImagesFromAlbum(albumId.Value);
+
+			int totalImages = images.Count();
+			if (totalImages > ItemsPerPage)
+				images = images.Skip((page - 1) * ItemsPerPage).Take(ItemsPerPage);
+
 			var model = new GalleryAlbumViewModel()
 			{
-				Images = albumsImagesRepository.GetImagesFromAlbum(albumId.Value),
-				AlbumTitle = albumsRepository.GetAlbumTitle(albumId.Value)
+				Images = images,
+				AlbumTitle = albumsRepository.GetAlbumTitle(albumId.Value),
+				PagingInformation = new PagingInformation()
+				{
+					CurrentPage = page,
+					ItemsPerPage = ItemsPerPage,
+					TotalItems = totalImages
+				}
 			};
 
 			return View(model);
@@ -51,7 +65,6 @@ namespace Gallery.Controllers
 			var image = imageRepository.Get(id.Value);
 			if (image == null)
 				return NotFound();
-
 
 			return RedirectToAction(nameof(ImageDetails), nameof(Gallery), image);
 		}

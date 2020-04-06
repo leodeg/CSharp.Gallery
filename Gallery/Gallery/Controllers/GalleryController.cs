@@ -15,24 +15,34 @@ namespace Gallery.Controllers
 		private readonly ImageRepository imageRepository;
 		private readonly AlbumsImagesRepository albumsImagesRepository;
 
+		private readonly int ItemsPerPage = 40;
+
 		public GalleryController(ImageRepository imageRepository, AlbumsImagesRepository albumsImagesRepository)
 		{
 			this.imageRepository = imageRepository;
 			this.albumsImagesRepository = albumsImagesRepository;
 		}
 
-		public IActionResult Index(int? albumId, string tag = "")
+		public IActionResult Index(string tag = "", int page = 1)
 		{
-			var model = new GalleryIndexViewModel();
+			IEnumerable<Image> images = string.IsNullOrEmpty(tag)
+				? imageRepository.Get()
+					: imageRepository.GetWithTag(tag);
 
-			if (albumId != null)
+			int totalImages = images.Count();
+			if (totalImages > ItemsPerPage)
+				images = images.Skip((page - 1) * ItemsPerPage).Take(ItemsPerPage);
+
+			var model = new GalleryIndexViewModel()
 			{
-				model.Images = albumsImagesRepository.GetImagesFromAlbum(albumId.Value);
-			}
-			else
-			{
-				model.Images = string.IsNullOrEmpty(tag) ? imageRepository.Get() : imageRepository.GetWithTag(tag);
-			}
+				Images = images,
+				PagingInformation = new PagingInformation()
+				{
+					CurrentPage = page,
+					ItemsPerPage = ItemsPerPage,
+					TotalItems = totalImages
+				}
+			};
 
 			return View(model);
 		}
